@@ -1,0 +1,3 @@
+- [x] Update ForgotPassword.jsx to implement step-by-step flow using stored security questions.
+- [x] Add "Forgot Password?" link in Login.jsx for non-Employee roles.
+- [x] Test the forgot password flow to ensure it works correctly.
