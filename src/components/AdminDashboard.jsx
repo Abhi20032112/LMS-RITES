@@ -8,7 +8,7 @@ import { initGapi, signIn, pushUsersToSheet, pushRequestsToSheet } from '@/lib/g
 const AdminDashboard = ({ user, onLogout }) => {
   const [allRequests, setAllRequests] = useState([]);
   const [allUsers, setAllUsers] = useState([]);
-  const [spreadsheetId, setSpreadsheetId] = useState('');
+  const [spreadsheetId, setSpreadsheetId] = useState('1MjBHPits0n1MzW7pD-PVqriuHWWtFJfDmNDPiwL0gZE');
   const [isLoadingUsers, setIsLoadingUsers] = useState(false);
   const [isLoadingRequests, setIsLoadingRequests] = useState(false);
   const [formData, setFormData] = useState({
