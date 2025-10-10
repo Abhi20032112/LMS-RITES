@@ -1,16 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { LogOut, Eye, UserPlus, Users, UploadCloud } from 'lucide-react';
+import { LogOut, Eye, UserPlus, Users } from 'lucide-react';
 import { Button } from '@/ui/button';
 import { toast } from '@/ui/use-toast';
-import { initGapi, signIn, pushUsersToSheet, pushRequestsToSheet } from '@/lib/googleSheets';
 
 const AdminDashboard = ({ user, onLogout }) => {
   const [allRequests, setAllRequests] = useState([]);
   const [allUsers, setAllUsers] = useState([]);
-  const [spreadsheetId, setSpreadsheetId] = useState('1MjBHPits0n1MzW7pD-PVqriuHWWtFJfDmNDPiwL0gZE');
-  const [isLoadingUsers, setIsLoadingUsers] = useState(false);
-  const [isLoadingRequests, setIsLoadingRequests] = useState(false);
   const [formData, setFormData] = useState({
     empId: '',
     name: '',
@@ -27,7 +23,6 @@ const AdminDashboard = ({ user, onLogout }) => {
   useEffect(() => {
     loadRequests();
     loadUsers();
-    initGapi().catch(console.error);
   }, []);
 
   const loadRequests = () => {
@@ -130,62 +125,6 @@ const AdminDashboard = ({ user, onLogout }) => {
       securityQuestion: '',
       securityAnswer: '',
     });
-  };
-
-  const handleExportUsers = async () => {
-    if (!spreadsheetId) {
-      toast({
-        title: "Spreadsheet ID Required",
-        description: "Please enter the Google Sheets spreadsheet ID.",
-        variant: "destructive",
-      });
-      return;
-    }
-    setIsLoadingUsers(true);
-    try {
-      await signIn();
-      await pushUsersToSheet(spreadsheetId, allUsers);
-      toast({
-        title: "Success",
-        description: "Users data exported to Google Sheets successfully!",
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoadingUsers(false);
-    }
-  };
-
-  const handleExportRequests = async () => {
-    if (!spreadsheetId) {
-      toast({
-        title: "Spreadsheet ID Required",
-        description: "Please enter the Google Sheets spreadsheet ID.",
-        variant: "destructive",
-      });
-      return;
-    }
-    setIsLoadingRequests(true);
-    try {
-      await signIn();
-      await pushRequestsToSheet(spreadsheetId, allRequests);
-      toast({
-        title: "Success",
-        description: "Leave requests data exported to Google Sheets successfully!",
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoadingRequests(false);
-    }
   };
 
   return (
@@ -554,56 +493,7 @@ const AdminDashboard = ({ user, onLogout }) => {
           )}
         </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 50, scale: 0.95 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ delay: 1.0, duration: 0.6, ease: "easeOut" }}
-          className="bg-white/95 backdrop-blur-sm rounded-2xl p-6 mb-6 shadow-xl border border-white/20 card-hover"
-          whileHover={{ y: -5, boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)" }}
-        >
-          <motion.h2
-            className="text-2xl font-bold text-gray-900 mb-6 flex items-center"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 1.2 }}
-          >
-            <UploadCloud className="w-6 h-6 mr-2 text-indigo-700" />
-            Export to Google Sheets
-          </motion.h2>
 
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-2 text-gray-700">Google Sheets Spreadsheet ID</label>
-              <input
-                type="text"
-                value={spreadsheetId}
-                onChange={(e) => setSpreadsheetId(e.target.value)}
-                className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-900 placeholder-gray-500 transition-all duration-300"
-                placeholder="Enter your Google Sheets ID"
-              />
-              <p className="text-xs text-gray-500 mt-1">The ID is the long string in the URL of your Google Sheet.</p>
-            </div>
-
-            <div className="flex gap-4">
-              <Button
-                onClick={handleExportUsers}
-                disabled={isLoadingUsers}
-                className="bg-indigo-600 hover:bg-indigo-700 flex-1"
-              >
-                <UploadCloud className="w-4 h-4 mr-2" />
-                {isLoadingUsers ? "Exporting..." : "Export Users"}
-              </Button>
-              <Button
-                onClick={handleExportRequests}
-                disabled={isLoadingRequests}
-                className="bg-indigo-600 hover:bg-indigo-700 flex-1"
-              >
-                <UploadCloud className="w-4 h-4 mr-2" />
-                {isLoadingRequests ? "Exporting..." : "Export Requests"}
-              </Button>
-            </div>
-          </div>
-        </motion.div>
       </div>
     </motion.div>
   );
