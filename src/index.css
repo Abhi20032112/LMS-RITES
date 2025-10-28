@@ -276,7 +276,7 @@ body {
     padding: 12px 8px;
     border-bottom: 1px solid #E5E5E5;
     vertical-align: top;
-    color: white;
+    color: #000;
   }
 
   .table-rites tr:nth-child(even) {

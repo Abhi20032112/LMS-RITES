@@ -553,7 +553,7 @@ const AdminDashboard = ({ user, onLogout }) => {
           whileHover={{ y: -5, boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)" }}
         >
           <motion.h2
-            className="text-2xl font-bold text-white mb-6 flex items-center"
+            className="text-2xl font-bold text-gray-900 mb-6 flex items-center"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.8 }}
@@ -563,7 +563,7 @@ const AdminDashboard = ({ user, onLogout }) => {
           </motion.h2>
 
           {allUsers.filter(user => !['SBU Head', 'HR', 'Site Incharge'].includes(user.role)).length === 0 ? (
-            <p className="text-white text-center py-12">No employees found</p>
+            <p className="text-gray-500 text-center py-12">No employees found</p>
           ) : (
             <div className="overflow-x-auto">
               <table className="table-rites">
@@ -596,14 +596,14 @@ const AdminDashboard = ({ user, onLogout }) => {
                         variants={itemVariants}
                         whileHover={{ scale: 1.01, backgroundColor: "#f9fafb" }}
                       >
-                        <td className="text-white py-3 px-2">{user.empId}</td>
-                        <td className="text-white py-3 px-2">{user.name}</td>
-                        <td className="text-white py-3 px-2">{user.role}</td>
-                        <td className="text-white py-3 px-2">{user.department || 'N/A'}</td>
-                        <td className="text-white py-3 px-2">{user.dateOfJoining ? new Date(user.dateOfJoining).toLocaleDateString() : 'N/A'}</td>
-                        <td className="text-white py-3 px-2">{leavesTaken}</td>
-                        <td className="text-white py-3 px-2">{remainingLeave}</td>
-                        <td className="text-white py-3 px-2">
+                        <td className="text-gray-900 py-3 px-2">{user.empId}</td>
+                        <td className="text-gray-900 py-3 px-2">{user.name}</td>
+                        <td className="text-gray-900 py-3 px-2">{user.role}</td>
+                        <td className="text-gray-900 py-3 px-2">{user.department || 'N/A'}</td>
+                        <td className="text-gray-900 py-3 px-2">{user.dateOfJoining ? new Date(user.dateOfJoining).toLocaleDateString() : 'N/A'}</td>
+                        <td className="text-gray-900 py-3 px-2">{leavesTaken}</td>
+                        <td className="text-gray-900 py-3 px-2">{remainingLeave}</td>
+                        <td className="text-gray-900 py-3 px-2">
                           <motion.span
                             initial={{ scale: 1 }}
                             whileHover={{ scale: 1.1 }}
@@ -612,7 +612,7 @@ const AdminDashboard = ({ user, onLogout }) => {
                             {user.clBalance}
                           </motion.span>
                         </td>
-                        <td className="text-white py-3 px-2">
+                        <td className="text-gray-900 py-3 px-2">
                           <motion.span
                             initial={{ scale: 1 }}
                             whileHover={{ scale: 1.1 }}
@@ -621,7 +621,7 @@ const AdminDashboard = ({ user, onLogout }) => {
                             {user.coBalance}
                           </motion.span>
                         </td>
-                        <td className="text-white py-3 px-2">{user.contactInfo || 'N/A'}</td>
+                        <td className="text-gray-900 py-3 px-2">{user.contactInfo || 'N/A'}</td>
                       </motion.tr>
                     );
                   })}
