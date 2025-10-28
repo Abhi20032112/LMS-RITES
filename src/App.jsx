@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
 import { AnimatePresence, motion } from 'framer-motion';
+import Landing from './components/Landing';
 import Login from './components/Login';
 import ForgotPassword from './components/ForgotPassword';
 import EmployeeDashboard from './components/EmployeeDashboard';
@@ -9,7 +10,7 @@ import HRDashboard from './components/HRDashboard';
 import SBUHeadDashboard from './components/SBUHeadDashboard';
 import AdminDashboard from './components/AdminDashboard';
 import { Toaster } from './ui/toaster';
-import logo from '../LOGO/Rites LOGO.jpeg';
+import logo from '../LOGO/WhatsApp Image 2025-09-24 at 11.30.54 AM.jpeg';
 
 const pageVariants = {
   initial: {
@@ -38,6 +39,7 @@ const pageTransition = {
 function App() {
   const [currentView, setCurrentView] = useState('login');
   const [currentUser, setCurrentUser] = useState(null);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
     const users = JSON.parse(localStorage.getItem('users') || '[]');
@@ -58,28 +60,63 @@ function App() {
       localStorage.setItem('users', JSON.stringify(users));
     }
 
+    // Check for existing session, but don't auto-login
     const loggedInUser = localStorage.getItem('currentUser');
     if (loggedInUser) {
-      setCurrentUser(JSON.parse(loggedInUser));
       const user = JSON.parse(loggedInUser);
-      setCurrentView(user.role.toLowerCase().replace(' ', ''));
+      // Only set user if we have a valid session, but keep view as login initially
+      setCurrentUser(user);
+      // For now, keep on login page - user must login manually
     }
   }, []);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Route guard: Prevent access to dashboard views without login
+  useEffect(() => {
+    const dashboardViews = ['employee', 'siteincharge', 'hr', 'sbuhead', 'admin'];
+    if (dashboardViews.includes(currentView) && !currentUser) {
+      setCurrentView('login');
+    }
+  }, [currentView, currentUser]);
 
   const handleLogin = (user) => {
     setCurrentUser(user);
     localStorage.setItem('currentUser', JSON.stringify(user));
-    setCurrentView(user.role.toLowerCase().replace(' ', ''));
+
+    // Normalize role names to match dashboard component names
+    const roleMap = {
+      'Employee': 'employee',
+      'Site Incharge': 'siteincharge',
+      'HR': 'hr',
+      'SBU Head': 'sbuhead',
+      'Admin': 'admin'
+    };
+
+    const normalizedRole = roleMap[user.role] || 'employee';
+    setCurrentView(normalizedRole);
   };
 
   const handleLogout = () => {
     setCurrentUser(null);
     localStorage.removeItem('currentUser');
+    // Clear any other session data if needed
+    localStorage.removeItem('leaveRequests'); // Optional: clear cached requests
     setCurrentView('login');
+    // Prevent back button from going back to dashboard
+    window.history.replaceState(null, null, window.location.pathname);
   };
 
   const renderView = () => {
     switch (currentView) {
+      case 'landing':
+        return <Landing key="landing" onNavigateToLogin={() => setCurrentView('login')} />;
       case 'login':
         return <Login key="login" onLogin={handleLogin} onNavigate={setCurrentView} />;
       case 'forgot':
@@ -95,24 +132,26 @@ function App() {
       case 'admin':
         return <AdminDashboard key="admin" user={currentUser} onLogout={handleLogout} />;
       default:
-        return <Login key="default" onLogin={handleLogin} onNavigate={setCurrentView} />;
+        return <Landing key="default" onNavigateToLogin={() => setCurrentView('login')} />;
     }
   };
 
   return (
     <>
       <Helmet>
-        <title>Leave Management System - Rites</title>
+        <title>Leave Management System - RITES</title>
         <meta name="description" content="Complete leave management system with multi-level approval workflow for efficient leave tracking and management" />
       </Helmet>
       <div className="min-h-screen gradient-bg text-white fade-in">
-        <header className="flex items-center justify-between p-4 shadow-lg hover-lift bg-white">
+        <div className="parallax-train"></div>
+        <div className="track-line fixed bottom-0 w-full h-2 z-10"></div>
+        <header className={`fixed top-0 left-0 right-0 z-50 flex items-center justify-between p-4 shadow-lg hover-lift transition-all duration-300 ${isScrolled ? 'bg-white/90 backdrop-blur-md text-black border-b border-gray-200' : 'bg-transparent text-white'}`}>
           <div className="flex items-center">
-            <img src={logo} alt="Rites Logo" className="h-12 w-auto logo-animated" />
-            <h1 className="ml-4 text-xl md:text-2xl font-bold gradient-text">Rites Leave Management</h1>
+            <img src={logo} alt="RITES Logo" className={`h-12 w-auto logo-animated transition-all duration-300 ${isScrolled ? 'filter invert' : ''}`} />
+            <h1 className={`ml-4 text-xl md:text-2xl font-bold transition-all duration-300 ${isScrolled ? 'text-black' : 'led-text'}`}>RITES Leave Management</h1>
           </div>
         </header>
-        <main className="p-4 md:p-6 lg:p-8 slide-up">
+        <main className="pt-20 p-4 md:p-6 lg:p-8 slide-up">
 <AnimatePresence mode="wait">
             <motion.div
               key={currentView}
@@ -126,6 +165,34 @@ function App() {
             </motion.div>
           </AnimatePresence>
         </main>
+
+        {/* Footer with Credits */}
+        <motion.footer
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5, duration: 0.6 }}
+          className="relative bg-gradient-to-r from-rites-green-900 via-rites-blue-900 to-rites-green-900 text-white py-8 mt-12"
+        >
+          {/* Thin Divider */}
+          <div className="w-full h-px bg-gradient-to-r from-transparent via-white/30 to-transparent mb-6"></div>
+
+          <div className="max-w-4xl mx-auto px-4 text-center">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.7, duration: 0.5 }}
+              className="space-y-2"
+            >
+              <p className="text-lg font-semibold">
+                <span className="font-bold text-rites-green-300">Created & Developed by:</span> <span className="font-bold">Abhijeet Mohan Mishra</span> <span className="text-sm text-rites-blue-200">(IT Engineer – Bhilai)</span>
+              </p>
+              <p className="text-lg font-semibold">
+                <span className="font-bold text-rites-green-300">Concept & Idea by:</span> <span className="font-bold">Veeravalli Sri Ram Kumar</span> <span className="text-sm text-rites-blue-200">(Assistant – HR)</span>
+              </p>
+            </motion.div>
+          </div>
+        </motion.footer>
+
         <Toaster />
       </div>
     </>

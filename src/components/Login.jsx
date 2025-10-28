@@ -1,64 +1,69 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { LogIn, User, Lock } from 'lucide-react';
 import { Button } from '@/ui/button';
 import { toast } from '@/ui/use-toast';
 
-const employees = [
-  { empNo: '103741', name: 'Anup Kumar Gupta', designation: 'Technical Assistant', clBalance: 0, coBalance: 0 },
-  { empNo: '103768', name: 'Dwarapudi Lahari', designation: 'Technical Assistant', clBalance: 0, coBalance: 2 },
-  { empNo: '103782', name: 'Rongali Sai Bhargav', designation: 'Technical Assistant', clBalance: 0.5, coBalance: 0 },
-  { empNo: '103742', name: 'Ch. Jagadeesh', designation: 'Technical Assistant', clBalance: 1.5, coBalance: 0 },
-  { empNo: '103739', name: 'Nisha Choudhary', designation: 'Technical Assistant', clBalance: 1, coBalance: 0 },
-  { empNo: '103731', name: 'Abhinay Banjare', designation: 'Technical Assistant', clBalance: 1.5, coBalance: 0 },
-  { empNo: '103755', name: 'Rajat Das', designation: 'Technical Assistant', clBalance: 1.5, coBalance: 0 },
-  { empNo: '103779', name: 'Praveen Kolakaluri', designation: 'Technical Assistant', clBalance: 1.5, coBalance: 0 },
-  { empNo: '103764', name: 'Hari Haran Rachabattuni', designation: 'Technical Assistant', clBalance: 1.5, coBalance: 0 },
-  { empNo: '104341', name: 'Ravi Pothumudi', designation: 'Technical Assistant', clBalance: 1.5, coBalance: 0 },
-  { empNo: '103749', name: 'Koushik Barik', designation: 'Technical Assistant', clBalance: 1.5, coBalance: 0 },
-  { empNo: '103772', name: 'Yograj', designation: 'Technical Assistant', clBalance: 1.5, coBalance: 0 },
-  { empNo: '104322', name: 'Ayush Kumar', designation: 'Technical Assistant', clBalance: 1.5, coBalance: 0 },
-  { empNo: '103774', name: 'Akhilesh Mahto', designation: 'Technical Assistant', clBalance: 1.5, coBalance: 0 },
-  { empNo: '103744', name: 'Rup Kamal', designation: 'Technical Assistant', clBalance: 1.5, coBalance: 0 },
-  { empNo: '103747', name: 'Raj Kumar Singh', designation: 'Technical Assistant', clBalance: 1.5, coBalance: 0 },
-  { empNo: '103748', name: 'Lakesh Kumar', designation: 'Technical Assistant', clBalance: 1.5, coBalance: 0 },
-  { empNo: '103769', name: 'Ashwini Joshi', designation: 'Technical Assistant', clBalance: 1.5, coBalance: 0 },
-  { empNo: '103762', name: 'Sumit', designation: 'Technical Assistant', clBalance: 1.5, coBalance: 0 },
-  { empNo: '103763', name: 'Himanshu Sahu', designation: 'Technical Assistant', clBalance: 1.5, coBalance: 0 },
-  { empNo: '103788', name: 'Jagdish Badhai', designation: 'Technical Assistant', clBalance: 1.5, coBalance: 0 },
-  { empNo: '103729', name: 'Kuleshwar Yadav', designation: 'Technical Assistant', clBalance: 1.5, coBalance: 0 },
-  { empNo: '103726', name: 'Numendra Kumar Baidh', designation: 'Technical Assistant', clBalance: 1.5, coBalance: 0 },
-  { empNo: '103785', name: 'Nitesh Kumar', designation: 'Technical Assistant', clBalance: 1.5, coBalance: 0 },
-  { empNo: '104325', name: 'Chaitanya Ram Sahu', designation: 'Technical Assistant', clBalance: 1.5, coBalance: 0 },
-  { empNo: '103759', name: 'Vikas Kumar Prasad', designation: 'Technical Assistant', clBalance: 1.5, coBalance: 0 },
-];
-
 const Login = ({ onLogin, onNavigate }) => {
-  const [selectedRole, setSelectedRole] = useState('Employee');
+  const [selectedRole, setSelectedRole] = useState('');
   const [empId, setEmpId] = useState('');
   const [password, setPassword] = useState('');
 
   const roles = ['Employee', 'Site Incharge', 'HR', 'SBU Head', 'Admin'];
 
-  const handleSubmit = (e) => {
+  // Reset role selection on component mount
+  useEffect(() => {
+    setSelectedRole('');
+  }, []);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     let user;
     if (selectedRole === 'Employee') {
-      const employee = employees.find(e => e.empNo === empId);
-      if (employee) {
-        user = {
-          empId: employee.empNo,
-          name: employee.name,
-          designation: employee.designation,
-          role: 'Employee',
-          clBalance: employee.clBalance,
-          coBalance: employee.coBalance,
-        };
+      // Employees login via localStorage (created by admins)
+      const users = JSON.parse(localStorage.getItem('users') || '[]');
+      user = users.find(u => u.empId === empId && u.role === 'Employee');
+      if (!user) {
+        toast({
+          title: "Login Failed",
+          description: "Invalid Employee ID",
+          variant: "destructive",
+        });
+        return;
+      }
+    } else if (selectedRole === 'Admin') {
+      try {
+        const response = await fetch('http://localhost:5000/api/admin/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ username: empId, password }),
+        });
+        const data = await response.json();
+        if (data.success) {
+          user = data.user;
+        } else {
+          toast({
+            title: "Login Failed",
+            description: data.message || "Invalid credentials",
+            variant: "destructive",
+          });
+          return;
+        }
+      } catch (error) {
+        toast({
+          title: "Login Failed",
+          description: "Unable to connect to server",
+          variant: "destructive",
+        });
+        return;
       }
     } else {
+      // Other roles login via localStorage
       const users = JSON.parse(localStorage.getItem('users') || '[]');
-      user = users.find(u => u.empId == empId && u.password === password && u.role === selectedRole);
+      user = users.find(u => u.empId === empId && u.password === password && u.role === selectedRole);
     }
 
     if (user) {
@@ -77,7 +82,7 @@ const Login = ({ onLogin, onNavigate }) => {
   };
 
   const containerVariants = {
-    hidden: { opacity: 0 },
+    hidden: { opacity: 1 },
     visible: {
       opacity: 1,
       transition: {
@@ -88,7 +93,7 @@ const Login = ({ onLogin, onNavigate }) => {
   };
 
   const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
+    hidden: { y: 20, opacity: 1 },
     visible: {
       y: 0,
       opacity: 1,
@@ -107,7 +112,45 @@ const Login = ({ onLogin, onNavigate }) => {
         transition={{ duration: 0.5 }}
         className="w-full max-w-md"
       >
-        <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-6 md:p-8 shadow-xl border border-white/20 card-hover">
+        <div className="bg-white/95 backdrop-blur-md rounded-3xl p-8 md:p-10 shadow-2xl border border-white/30 card-hover relative overflow-hidden">
+          {/* Animated background elements */}
+          <motion.div
+            className="absolute top-0 left-0 w-full h-full opacity-5"
+            animate={{
+              backgroundPosition: ['0% 0%', '100% 100%'],
+            }}
+            transition={{
+              duration: 20,
+              repeat: Infinity,
+              ease: 'linear',
+            }}
+            style={{
+              backgroundImage: 'radial-gradient(circle at 20% 80%, #10b981 0%, transparent 50%), radial-gradient(circle at 80% 20%, #059669 0%, transparent 50%), radial-gradient(circle at 40% 40%, #047857 0%, transparent 50%)',
+              backgroundSize: '200% 200%',
+            }}
+          />
+
+          {/* Floating particles */}
+          {[...Array(6)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute w-2 h-2 bg-green-400/20 rounded-full"
+              style={{
+                top: `${20 + i * 10}%`,
+                left: `${10 + i * 15}%`,
+              }}
+              animate={{
+                y: [0, -20, 0],
+                opacity: [0.2, 0.5, 0.2],
+              }}
+              transition={{
+                duration: 3 + i * 0.5,
+                repeat: Infinity,
+                ease: 'easeInOut',
+                delay: i * 0.2,
+              }}
+            />
+          ))}
           <motion.div
             initial={{ y: -20 }}
             animate={{ y: 0 }}
@@ -117,39 +160,32 @@ const Login = ({ onLogin, onNavigate }) => {
             <p className="text-gray-600">Sign in to continue</p>
           </motion.div>
 
-          <motion.div
-            className="mb-6"
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-          >
+          <motion.div variants={itemVariants}>
             <motion.label
-              className="block text-sm font-medium mb-3 text-gray-700"
+              className="block text-sm font-medium mb-2 text-gray-700"
               variants={itemVariants}
             >
               Select Your Role
             </motion.label>
             <motion.div
-              className="grid grid-cols-2 gap-2"
-              variants={containerVariants}
+              className="relative"
+              variants={itemVariants}
             >
-              {roles.map((role, index) => (
-                <motion.button
-                  key={role}
-                  type="button"
-                  onClick={() => setSelectedRole(role)}
-                  className={`py-2 px-3 rounded-lg text-sm font-medium transition-all duration-300 ${
-                    selectedRole === role
-                      ? 'bg-green-600 text-white shadow-lg scale-105'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:scale-105'
-                  }`}
-                  variants={itemVariants}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  {role}
-                </motion.button>
-              ))}
+              <motion.select
+                value={selectedRole}
+                onChange={(e) => setSelectedRole(e.target.value)}
+                className="w-full pl-4 pr-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-900 placeholder-gray-500 transition-all duration-300"
+                required
+                whileFocus={{ scale: 1.02 }}
+                variants={itemVariants}
+              >
+                <option value="">Select a role</option>
+                {roles.map((role) => (
+                  <option key={role} value={role}>
+                    {role}
+                  </option>
+                ))}
+              </motion.select>
             </motion.div>
           </motion.div>
 
@@ -215,12 +251,18 @@ const Login = ({ onLogin, onNavigate }) => {
             <motion.div variants={itemVariants}>
               <Button
                 type="submit"
-                className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold py-3 rounded-lg btn-hover shadow-lg"
-                whileHover={{ scale: 1.02 }}
+                className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold py-4 px-6 rounded-xl btn-hover shadow-xl hover:shadow-green-500/25 transition-all duration-300 relative overflow-hidden group"
+                whileHover={{ scale: 1.02, y: -2 }}
                 whileTap={{ scale: 0.98 }}
               >
-                <LogIn className="w-5 h-5 mr-2" />
-                Sign In
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-r from-green-400 to-green-500 opacity-0 group-hover:opacity-20 transition-opacity duration-300"
+                  initial={false}
+                  animate={{ x: ['-100%', '100%'] }}
+                  transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+                />
+                <LogIn className="w-5 h-5 mr-2 relative z-10" />
+                <span className="relative z-10">Sign In</span>
               </Button>
             </motion.div>
           </motion.form>

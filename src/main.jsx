@@ -48,7 +48,7 @@ const initializeApp = () => {
         name: 'Admin User',
         designation: 'Administrator',
         role: 'Admin',
-        password: 'password123',
+        password: 'admin@123',
         clBalance: 12,
         coBalance: 0,
       },
