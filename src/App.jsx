@@ -9,6 +9,7 @@ import SiteInchargeDashboard from './components/SiteInchargeDashboard';
 import HRDashboard from './components/HRDashboard';
 import SBUHeadDashboard from './components/SBUHeadDashboard';
 import AdminDashboard from './components/AdminDashboard';
+import Sidebar from './components/Sidebar';
 import { Toaster } from './ui/toaster';
 import logo from '../LOGO/WhatsApp Image 2025-09-24 at 11.30.54 AM.jpeg';
 
@@ -40,6 +41,8 @@ function App() {
   const [currentView, setCurrentView] = useState('login');
   const [currentUser, setCurrentUser] = useState(null);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState('dashboard');
 
   useEffect(() => {
     const users = JSON.parse(localStorage.getItem('users') || '[]');
@@ -101,6 +104,7 @@ function App() {
 
     const normalizedRole = roleMap[user.role] || 'employee';
     setCurrentView(normalizedRole);
+    setActiveSection('dashboard');
   };
 
   const handleLogout = () => {
@@ -114,6 +118,40 @@ function App() {
   };
 
   const renderView = () => {
+    const dashboardViews = ['employee', 'siteincharge', 'hr', 'sbuhead', 'admin'];
+
+    if (dashboardViews.includes(currentView) && currentUser) {
+      return (
+        <div className="flex min-h-screen">
+          <Sidebar
+            isOpen={sidebarOpen}
+            onToggle={() => setSidebarOpen(!sidebarOpen)}
+            activeSection={activeSection}
+            onSectionChange={setActiveSection}
+            userRole={currentUser.role}
+          />
+          <div className={`flex-1 transition-all duration-300 ${sidebarOpen ? 'md:ml-64' : 'md:ml-0'}`}>
+            {(() => {
+              switch (currentView) {
+                case 'employee':
+                  return <EmployeeDashboard key="employee" user={currentUser} onLogout={handleLogout} activeSection={activeSection} />;
+                case 'siteincharge':
+                  return <SiteInchargeDashboard key="siteincharge" user={currentUser} onLogout={handleLogout} activeSection={activeSection} />;
+                case 'hr':
+                  return <HRDashboard key="hr" user={currentUser} onLogout={handleLogout} activeSection={activeSection} />;
+                case 'sbuhead':
+                  return <SBUHeadDashboard key="sbuhead" user={currentUser} onLogout={handleLogout} activeSection={activeSection} />;
+                case 'admin':
+                  return <AdminDashboard key="admin" user={currentUser} onLogout={handleLogout} activeSection={activeSection} />;
+                default:
+                  return <Landing key="default" onNavigateToLogin={() => setCurrentView('login')} />;
+              }
+            })()}
+          </div>
+        </div>
+      );
+    }
+
     switch (currentView) {
       case 'landing':
         return <Landing key="landing" onNavigateToLogin={() => setCurrentView('login')} />;
@@ -121,16 +159,6 @@ function App() {
         return <Login key="login" onLogin={handleLogin} onNavigate={setCurrentView} />;
       case 'forgot':
         return <ForgotPassword key="forgot" onNavigate={setCurrentView} />;
-      case 'employee':
-        return <EmployeeDashboard key="employee" user={currentUser} onLogout={handleLogout} />;
-      case 'siteincharge':
-        return <SiteInchargeDashboard key="siteincharge" user={currentUser} onLogout={handleLogout} />;
-      case 'hr':
-        return <HRDashboard key="hr" user={currentUser} onLogout={handleLogout} />;
-      case 'sbuhead':
-        return <SBUHeadDashboard key="sbuhead" user={currentUser} onLogout={handleLogout} />;
-      case 'admin':
-        return <AdminDashboard key="admin" user={currentUser} onLogout={handleLogout} />;
       default:
         return <Landing key="default" onNavigateToLogin={() => setCurrentView('login')} />;
     }

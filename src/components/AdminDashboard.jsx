@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { LogOut, Eye, UserPlus, Users, Trash2 } from 'lucide-react';
+import { LogOut, Eye, UserPlus, Users, Trash2, Users as UsersIcon, Calendar, CheckCircle, XCircle, Clock, TrendingUp, BarChart3, PieChart, Activity } from 'lucide-react';
 import { Button } from '@/ui/button';
 import { toast } from '@/ui/use-toast';
+import InfoCard from './InfoCard';
+import ProgressChart from './ProgressChart';
 
 const AdminDashboard = ({ user, onLogout }) => {
   const [allRequests, setAllRequests] = useState([]);
@@ -19,6 +21,9 @@ const AdminDashboard = ({ user, onLogout }) => {
     coBalance: 0,
     securityQuestion: '',
     securityAnswer: '',
+    department: '',
+    dateOfJoining: '',
+    contactInfo: '',
   });
 
   // Check if current admin is authorized
@@ -117,6 +122,9 @@ const AdminDashboard = ({ user, onLogout }) => {
           coBalance: formData.coBalance,
           securityQuestion: formData.securityQuestion,
           securityAnswer: formData.securityAnswer,
+          department: formData.department,
+          dateOfJoining: formData.dateOfJoining,
+          contactInfo: formData.contactInfo,
         }),
       });
 
@@ -140,6 +148,9 @@ const AdminDashboard = ({ user, onLogout }) => {
           coBalance: 0,
           securityQuestion: '',
           securityAnswer: '',
+          department: '',
+          dateOfJoining: '',
+          contactInfo: '',
         });
       } else {
         toast({
@@ -245,6 +256,80 @@ const AdminDashboard = ({ user, onLogout }) => {
                 Logout
               </Button>
             </motion.div>
+          </div>
+        </motion.div>
+
+        <div className="track-separator"></div>
+
+        {/* Railway-Themed Stats Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 50, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ delay: 0.4, duration: 0.6, ease: "easeOut" }}
+          className="mb-6"
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+            <InfoCard
+              title="Total Employees"
+              value={allUsers.length}
+              icon={UsersIcon}
+              color="green"
+              delay={0.1}
+              railwayTheme={true}
+            />
+            <InfoCard
+              title="Total Requests"
+              value={allRequests.length}
+              icon={Calendar}
+              color="blue"
+              delay={0.2}
+              railwayTheme={true}
+            />
+            <InfoCard
+              title="Approved"
+              value={allRequests.filter(r => r.finalStatus.includes('Approved')).length}
+              icon={CheckCircle}
+              color="green"
+              delay={0.3}
+              railwayTheme={true}
+            />
+            <InfoCard
+              title="Pending"
+              value={allRequests.filter(r => r.finalStatus.includes('Pending')).length}
+              icon={Clock}
+              color="orange"
+              delay={0.4}
+              railwayTheme={true}
+            />
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <ProgressChart
+              title="Leave Request Status Distribution"
+              data={[
+                { label: 'Approved', value: allRequests.filter(r => r.finalStatus.includes('Approved')).length, percentage: allRequests.length > 0 ? (allRequests.filter(r => r.finalStatus.includes('Approved')).length / allRequests.length * 100).toFixed(1) : 0, color: '#22c55e' },
+                { label: 'Rejected', value: allRequests.filter(r => r.finalStatus.includes('Rejected')).length, percentage: allRequests.length > 0 ? (allRequests.filter(r => r.finalStatus.includes('Rejected')).length / allRequests.length * 100).toFixed(1) : 0, color: '#ef4444' },
+                { label: 'Pending', value: allRequests.filter(r => r.finalStatus.includes('Pending')).length, percentage: allRequests.length > 0 ? (allRequests.filter(r => r.finalStatus.includes('Pending')).length / allRequests.length * 100).toFixed(1) : 0, color: '#f59e0b' },
+              ]}
+              type="pie"
+              height={300}
+              delay={0.5}
+              railwayTheme={true}
+            />
+            <ProgressChart
+              title="Monthly Leave Trends"
+              data={[
+                { label: 'Jan', value: 12, percentage: 60 },
+                { label: 'Feb', value: 19, percentage: 95 },
+                { label: 'Mar', value: 15, percentage: 75 },
+                { label: 'Apr', value: 8, percentage: 40 },
+                { label: 'May', value: 22, percentage: 110 },
+              ]}
+              type="bar"
+              height={300}
+              delay={0.6}
+              railwayTheme={true}
+            />
           </div>
         </motion.div>
 
@@ -407,6 +492,44 @@ const AdminDashboard = ({ user, onLogout }) => {
                   required
                 />
               </motion.div>
+
+              <motion.div variants={itemVariants}>
+                <label className="block text-sm font-medium mb-2 text-gray-700">Department</label>
+                <input
+                  type="text"
+                  name="department"
+                  value={formData.department}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-900 placeholder-gray-500 transition-all duration-300"
+                  placeholder="e.g., IT, HR, Finance"
+                  required
+                />
+              </motion.div>
+
+              <motion.div variants={itemVariants}>
+                <label className="block text-sm font-medium mb-2 text-gray-700">Date of Joining</label>
+                <input
+                  type="date"
+                  name="dateOfJoining"
+                  value={formData.dateOfJoining}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-900 transition-all duration-300"
+                  required
+                />
+              </motion.div>
+
+              <motion.div variants={itemVariants}>
+                <label className="block text-sm font-medium mb-2 text-gray-700">Contact Info</label>
+                <input
+                  type="text"
+                  name="contactInfo"
+                  value={formData.contactInfo}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-900 placeholder-gray-500 transition-all duration-300"
+                  placeholder="Phone number or email"
+                  required
+                />
+              </motion.div>
             </motion.div>
 
             <Button
@@ -421,6 +544,7 @@ const AdminDashboard = ({ user, onLogout }) => {
 
         <div className="track-separator"></div>
 
+        {/* Employee Leave Balance Overview */}
         <motion.div
           initial={{ opacity: 0, y: 50, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -429,17 +553,180 @@ const AdminDashboard = ({ user, onLogout }) => {
           whileHover={{ y: -5, boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)" }}
         >
           <motion.h2
-            className="text-2xl font-bold text-gray-900 mb-6 flex items-center"
+            className="text-2xl font-bold text-white mb-6 flex items-center"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.8 }}
           >
             <Users className="w-6 h-6 mr-2 text-green-700" />
-            All Employees
+            Employee Leave Balance Overview
+          </motion.h2>
+
+          {allUsers.filter(user => !['SBU Head', 'HR', 'Site Incharge'].includes(user.role)).length === 0 ? (
+            <p className="text-white text-center py-12">No employees found</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="table-rites">
+                <thead>
+                  <tr>
+                    <th>Employee ID</th>
+                    <th>Name</th>
+                    <th>Role</th>
+                    <th>Department</th>
+                    <th>Date of Joining</th>
+                    <th>Total Leaves Taken</th>
+                    <th>Remaining Leave</th>
+                    <th>CL Balance</th>
+                    <th>CO Balance</th>
+                    <th>Contact Info</th>
+                  </tr>
+                </thead>
+                <motion.tbody
+                  variants={containerVariants}
+                  initial="hidden"
+                  animate="visible"
+                >
+                  {allUsers.filter(user => !['SBU Head', 'HR', 'Site Incharge'].includes(user.role)).map((user, index) => {
+                    const leavesTaken = allRequests.filter(r => r.empId === user.empId && r.finalStatus.includes('Approved')).reduce((sum, r) => sum + r.days, 0);
+                    const remainingLeave = user.clBalance + user.coBalance;
+                    return (
+                      <motion.tr
+                        key={user.empId}
+                        className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
+                        variants={itemVariants}
+                        whileHover={{ scale: 1.01, backgroundColor: "#f9fafb" }}
+                      >
+                        <td className="text-white py-3 px-2">{user.empId}</td>
+                        <td className="text-white py-3 px-2">{user.name}</td>
+                        <td className="text-white py-3 px-2">{user.role}</td>
+                        <td className="text-white py-3 px-2">{user.department || 'N/A'}</td>
+                        <td className="text-white py-3 px-2">{user.dateOfJoining ? new Date(user.dateOfJoining).toLocaleDateString() : 'N/A'}</td>
+                        <td className="text-white py-3 px-2">{leavesTaken}</td>
+                        <td className="text-white py-3 px-2">{remainingLeave}</td>
+                        <td className="text-white py-3 px-2">
+                          <motion.span
+                            initial={{ scale: 1 }}
+                            whileHover={{ scale: 1.1 }}
+                            className="inline-block"
+                          >
+                            {user.clBalance}
+                          </motion.span>
+                        </td>
+                        <td className="text-white py-3 px-2">
+                          <motion.span
+                            initial={{ scale: 1 }}
+                            whileHover={{ scale: 1.1 }}
+                            className="inline-block"
+                          >
+                            {user.coBalance}
+                          </motion.span>
+                        </td>
+                        <td className="text-white py-3 px-2">{user.contactInfo || 'N/A'}</td>
+                      </motion.tr>
+                    );
+                  })}
+                </motion.tbody>
+              </table>
+            </div>
+          )}
+        </motion.div>
+
+        {/* Pending Final Approvals */}
+        <motion.div
+          initial={{ opacity: 0, y: 50, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ delay: 0.7, duration: 0.6, ease: "easeOut" }}
+          className="bg-white/95 backdrop-blur-sm rounded-2xl p-6 mb-6 shadow-xl border border-white/20 card-hover"
+          whileHover={{ y: -5, boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)" }}
+        >
+          <motion.h2
+            className="text-2xl font-bold text-white mb-6 flex items-center"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.9 }}
+          >
+            <Clock className="w-6 h-6 mr-2 text-yellow-500" />
+            Pending Final Approvals
+          </motion.h2>
+
+          {allRequests.filter(r => r.finalStatus.includes('Pending')).length === 0 ? (
+            <p className="text-white text-center py-12">No pending approvals</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="table-rites">
+                <thead>
+                  <tr>
+                    <th>Employee</th>
+                    <th>Leave Type</th>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Days</th>
+                    <th>Current Status</th>
+                  </tr>
+                </thead>
+                <motion.tbody
+                  variants={containerVariants}
+                  initial="hidden"
+                  animate="visible"
+                >
+                  {allRequests.filter(r => r.finalStatus.includes('Pending')).map((request, index) => (
+                    <motion.tr
+                      key={request.leaveId}
+                      className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
+                      variants={itemVariants}
+                      whileHover={{ scale: 1.01, backgroundColor: "#f9fafb" }}
+                    >
+                      <td className="py-3 px-2">
+                        <div>
+                          <p className="text-white font-semibold">{request.name}</p>
+                          <p className="text-white/80 text-sm">{request.designation}</p>
+                          <p className="text-white/60 text-xs">ID: {request.empId}</p>
+                        </div>
+                      </td>
+                      <td className="text-white py-3 px-2">{request.leaveType}</td>
+                      <td className="text-white py-3 px-2">{new Date(request.from).toLocaleDateString()}</td>
+                      <td className="text-white py-3 px-2">{new Date(request.to).toLocaleDateString()}</td>
+                      <td className="text-white py-3 px-2">
+                        <motion.span
+                          initial={{ scale: 1 }}
+                          whileHover={{ scale: 1.1 }}
+                          className="inline-block"
+                        >
+                          {request.days}
+                        </motion.span>
+                      </td>
+                      <td className="py-3 px-2">
+                        <span className="text-yellow-500 font-semibold">
+                          {request.finalStatus}
+                        </span>
+                      </td>
+                    </motion.tr>
+                  ))}
+                </motion.tbody>
+              </table>
+            </div>
+          )}
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 50, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ delay: 0.8, duration: 0.6, ease: "easeOut" }}
+          className="bg-white/95 backdrop-blur-sm rounded-2xl p-6 mb-6 shadow-xl border border-white/20 card-hover"
+          whileHover={{ y: -5, boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)" }}
+        >
+          <motion.h2
+            className="text-2xl font-bold text-white mb-6 flex items-center"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 1.0 }}
+          >
+            <Users className="w-6 h-6 mr-2 text-green-700" />
+            All Employees (Admin View)
           </motion.h2>
 
           {allUsers.length === 0 ? (
-            <p className="text-gray-500 text-center py-12">No employees found</p>
+            <p className="text-white text-center py-12">No employees found</p>
           ) : (
             <div className="overflow-x-auto">
               <table className="table-rites">
@@ -467,13 +754,13 @@ const AdminDashboard = ({ user, onLogout }) => {
                       variants={itemVariants}
                       whileHover={{ scale: 1.01, backgroundColor: "#f9fafb" }}
                     >
-                      <td className="text-gray-900 py-3 px-2">{user.empId}</td>
-                      <td className="text-gray-900 py-3 px-2">{user.name}</td>
-                      <td className="text-gray-900 py-3 px-2">{user.designation}</td>
-                      <td className="text-gray-900 py-3 px-2">{user.role}</td>
-                      <td className="text-gray-900 py-3 px-2">{user.password}</td>
-                      <td className="text-gray-900 py-3 px-2">{user.clBalance}</td>
-                      <td className="text-gray-900 py-3 px-2">{user.coBalance}</td>
+                      <td className="text-white py-3 px-2">{user.empId}</td>
+                      <td className="text-white py-3 px-2">{user.name}</td>
+                      <td className="text-white py-3 px-2">{user.designation}</td>
+                      <td className="text-white py-3 px-2">{user.role}</td>
+                      <td className="text-white py-3 px-2">{user.password}</td>
+                      <td className="text-white py-3 px-2">{user.clBalance}</td>
+                      <td className="text-white py-3 px-2">{user.coBalance}</td>
                       <td className="py-3 px-2">
                         {user.empId !== '99508' && user.empId !== '13566' && (
                           <Button

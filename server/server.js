@@ -221,7 +221,7 @@ app.post('/api/leave/approve', (req, res) => {
 });
 
 app.post('/api/user/create', (req, res) => {
-  const { empId, name, designation, role, password, clBalance, coBalance, securityQuestion, securityAnswer } = req.body;
+  const { empId, name, designation, role, password, clBalance, coBalance, securityQuestion, securityAnswer, department, dateOfJoining, contactInfo } = req.body;
 
   const users = JSON.parse(localStorage.getItem('users') || '[]');
 
@@ -239,6 +239,9 @@ app.post('/api/user/create', (req, res) => {
     coBalance: coBalance || 0,
     securityQuestion,
     securityAnswer,
+    department: department || '',
+    dateOfJoining: dateOfJoining || '',
+    contactInfo: contactInfo || '',
   };
 
   users.push(newUser);

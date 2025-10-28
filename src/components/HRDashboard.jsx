@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { LogOut, CheckCircle, XCircle, Users } from 'lucide-react';
+import { LogOut, CheckCircle, XCircle, Users, Clock, UserCheck, FileText, TrendingUp } from 'lucide-react';
 import { Button } from '@/ui/button';
 import { toast } from '@/ui/use-toast';
+import InfoCard from './InfoCard';
+import ProgressChart from './ProgressChart';
 
 const HRDashboard = ({ user, onLogout }) => {
   const [pendingRequests, setPendingRequests] = useState([]);
@@ -89,10 +91,81 @@ const HRDashboard = ({ user, onLogout }) => {
           </div>
         </motion.div>
 
+        {/* HR-Themed Stats Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 50, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ delay: 0.2, duration: 0.6, ease: "easeOut" }}
+          className="mb-6"
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+            <InfoCard
+              title="Pending Approvals"
+              value={pendingRequests.length}
+              icon={Clock}
+              color="orange"
+              delay={0.1}
+              railwayTheme={true}
+            />
+            <InfoCard
+              title="Total Employees"
+              value={allUsers.length}
+              icon={UserCheck}
+              color="blue"
+              delay={0.2}
+              railwayTheme={true}
+            />
+            <InfoCard
+              title="Leave Requests"
+              value={JSON.parse(localStorage.getItem('leaveRequests') || '[]').length}
+              icon={FileText}
+              color="green"
+              delay={0.3}
+              railwayTheme={true}
+            />
+            <InfoCard
+              title="Cancel Requests"
+              value={JSON.parse(localStorage.getItem('cancelRequests') || '[]').length}
+              icon={TrendingUp}
+              color="purple"
+              delay={0.4}
+              railwayTheme={true}
+            />
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <ProgressChart
+              title="HR Approval Status"
+              data={[
+                { label: 'Approved', value: JSON.parse(localStorage.getItem('leaveRequests') || '[]').filter(r => r.hr === 'Approved').length + JSON.parse(localStorage.getItem('cancelRequests') || '[]').filter(r => r.hr === 'Approved').length, percentage: ((JSON.parse(localStorage.getItem('leaveRequests') || '[]').filter(r => r.hr === 'Approved').length + JSON.parse(localStorage.getItem('cancelRequests') || '[]').filter(r => r.hr === 'Approved').length) / (JSON.parse(localStorage.getItem('leaveRequests') || '[]').length + JSON.parse(localStorage.getItem('cancelRequests') || '[]').length) * 100).toFixed(1) || 0, color: '#22c55e' },
+                { label: 'Rejected', value: JSON.parse(localStorage.getItem('leaveRequests') || '[]').filter(r => r.hr === 'Rejected').length + JSON.parse(localStorage.getItem('cancelRequests') || '[]').filter(r => r.hr === 'Rejected').length, percentage: ((JSON.parse(localStorage.getItem('leaveRequests') || '[]').filter(r => r.hr === 'Rejected').length + JSON.parse(localStorage.getItem('cancelRequests') || '[]').filter(r => r.hr === 'Rejected').length) / (JSON.parse(localStorage.getItem('leaveRequests') || '[]').length + JSON.parse(localStorage.getItem('cancelRequests') || '[]').length) * 100).toFixed(1) || 0, color: '#ef4444' },
+                { label: 'Pending', value: pendingRequests.length, percentage: (pendingRequests.length / (JSON.parse(localStorage.getItem('leaveRequests') || '[]').length + JSON.parse(localStorage.getItem('cancelRequests') || '[]').length) * 100).toFixed(1) || 0, color: '#f59e0b' },
+              ]}
+              type="pie"
+              height={300}
+              delay={0.5}
+              railwayTheme={true}
+            />
+            <ProgressChart
+              title="Employee Leave Balance Overview"
+              data={[
+                { label: 'CL Balance', value: allUsers.reduce((sum, user) => sum + (user.clBalance || 0), 0), percentage: 75 },
+                { label: 'CO Balance', value: allUsers.reduce((sum, user) => sum + (user.coBalance || 0), 0), percentage: 25 },
+              ]}
+              type="bar"
+              height={300}
+              delay={0.6}
+              railwayTheme={true}
+            />
+          </div>
+        </motion.div>
+
+        <div className="track-separator"></div>
+
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
+          transition={{ delay: 0.4 }}
           className="glass-card p-6"
         >
           <h2 className="text-2xl font-bold gradient-text mb-6">Pending Approvals</h2>
