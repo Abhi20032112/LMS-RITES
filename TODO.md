@@ -1,31 +1,23 @@
-# LMS Dashboard Revamp TODO List
+# TODO: Create Default IDs for SBU Head, HR, and Site Incharge
 
-## ✅ Completed Tasks
-- [x] Update main App structure with sidebar navigation
-- [x] Enhance InfoCard component with railway-themed animations
-- [x] Enhance ProgressChart component with railway-inspired progress bars
-- [x] Revamp AdminDashboard with sidebar, animated info cards, charts
-- [x] Revamp EmployeeDashboard with sidebar, modern card layouts
-- [x] Revamp HRDashboard with animated info cards, sidebar, charts
-- [x] Revamp SiteInchargeDashboard with animated info cards, sidebar, charts
-- [x] Revamp SBUHeadDashboard with animated info cards, sidebar, charts
-- [x] Add railway elements (track lines, signal lights, gradients)
-- [x] Implement page transitions between dashboard sections
-- [x] Ensure full responsiveness across all dashboards
+## Steps to Complete
 
-## 🔄 In Progress
+1. **Edit server/server.js**
+   - Add `insertDefaultUsers()` function to insert default users for SBU Head, HR, and Site Incharge into localStorage if they don't exist.
+   - Call `insertDefaultUsers()` after `createTables()` in the database setup.
+   - [x] Completed: Added insertDefaultUsers() function and called it in createTables().
 
-## 📋 Pending Tasks
+2. **Restart the Server**
+   - After editing, restart the server to apply changes and insert default users.
+   - [x] Completed: Server restarted and default users inserted successfully.
 
-### 1. Testing & Optimization
-- [ ] Test all dashboard functionalities post-revamp
-- [ ] Verify responsiveness across devices
-- [ ] Ensure all existing features work perfectly
-- [ ] Performance optimization for animations
+3. **Test Login**
+   - Test logging in with the new default IDs:
+     - SBU Head: empId 'SBU001', password 'sbu@123'
+     - HR: empId 'HR001', password 'hr@123'
+     - Site Incharge: empId 'SITE001', password 'site@123'
 
-## 📝 Notes
-- Keep existing green-blue color theme (#007A33, #00A859, #2563eb)
-- Use Framer Motion for all animations
-- Maintain Lucide React icons
-- Ensure modular and reusable components
-- Keep existing functionality intact
+## Default User Details
+- **SBU Head**: empId: 'SBU001', name: 'John Doe', designation: 'SBU Head', role: 'SBU Head', password: 'sbu@123', clBalance: 12, coBalance: 0, securityQuestion: "What is your mother's maiden name?", securityAnswer: 'Smith', department: 'Management', dateOfJoining: '2023-01-01', contactInfo: 'john@example.com'
+- **HR**: empId: 'HR001', name: 'Jane Smith', designation: 'HR Manager', role: 'HR', password: 'hr@123', clBalance: 12, coBalance: 0, securityQuestion: "What is your mother's maiden name?", securityAnswer: 'Smith', department: 'HR', dateOfJoining: '2023-01-01', contactInfo: 'jane@example.com'
+- **Site Incharge**: empId: 'SITE001', name: 'Bob Johnson', designation: 'Site Incharge', role: 'Site Incharge', password: 'site@123', clBalance: 12, coBalance: 0, securityQuestion: "What is your mother's maiden name?", securityAnswer: 'Smith', department: 'Operations', dateOfJoining: '2023-01-01', contactInfo: 'bob@example.com'

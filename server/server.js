@@ -3,6 +3,8 @@ const sqlite3 = require('sqlite3').verbose();
 const bcrypt = require('bcryptjs');
 const cors = require('cors');
 const ExcelManager = require('./excelManager');
+const { LocalStorage } = require('node-localstorage');
+const localStorage = new LocalStorage('./scratch');
 require('dotenv').config();
 
 const app = express();
@@ -45,6 +47,7 @@ function createTables() {
       console.error('Error creating table:', err.message);
     } else {
       insertDefaultAdmins();
+      insertDefaultUsers();
     }
   });
 }
@@ -100,6 +103,65 @@ function insertDefaultAdmins() {
       }
     });
   });
+}
+
+// Insert default users for SBU Head, HR, and Site Incharge
+function insertDefaultUsers() {
+  const defaultUsers = [
+    {
+      empId: 'SBU001',
+      name: 'John Doe',
+      designation: 'SBU Head',
+      role: 'SBU Head',
+      password: 'sbu@123',
+      clBalance: 12,
+      coBalance: 0,
+      securityQuestion: "What is your mother's maiden name?",
+      securityAnswer: 'Smith',
+      department: 'Management',
+      dateOfJoining: '2023-01-01',
+      contactInfo: 'john@example.com'
+    },
+    {
+      empId: 'HR001',
+      name: 'Jane Smith',
+      designation: 'HR Manager',
+      role: 'HR',
+      password: 'hr@123',
+      clBalance: 12,
+      coBalance: 0,
+      securityQuestion: "What is your mother's maiden name?",
+      securityAnswer: 'Smith',
+      department: 'HR',
+      dateOfJoining: '2023-01-01',
+      contactInfo: 'jane@example.com'
+    },
+    {
+      empId: 'SITE001',
+      name: 'Bob Johnson',
+      designation: 'Site Incharge',
+      role: 'Site Incharge',
+      password: 'site@123',
+      clBalance: 12,
+      coBalance: 0,
+      securityQuestion: "What is your mother's maiden name?",
+      securityAnswer: 'Smith',
+      department: 'Operations',
+      dateOfJoining: '2023-01-01',
+      contactInfo: 'bob@example.com'
+    }
+  ];
+
+  const users = JSON.parse(localStorage.getItem('users') || '[]');
+
+  defaultUsers.forEach(user => {
+    if (!users.find(u => u.empId === user.empId)) {
+      users.push(user);
+      console.log(`Default user ${user.name} (${user.role}) inserted.`);
+    }
+  });
+
+  localStorage.setItem('users', JSON.stringify(users));
 }
 
 // API Routes
